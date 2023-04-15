@@ -1,0 +1,50 @@
+int speedPin = 5;
+int dir1 = 4;
+int dir2 = 7;
+int mSpeed=180;
+int Hall_Sensor=A0;
+int Hall_Sensor_D=2;
+int digitalInputValue; //digital reading
+int analogInputValue; //analog reading
+int Value1=0,Value2=0;
+int Mapped;
+
+void setup() {
+
+pinMode(speedPin,OUTPUT); // Motor Speed
+pinMode(dir1,OUTPUT);     // Motor Direction
+pinMode(dir2,OUTPUT);     // Motor Direction
+pinMode(Hall_Sensor,INPUT);
+pinMode(Hall_Sensor_D,INPUT);
+Serial.begin(9600);       // Start Serial Port
+
+}
+
+void loop() {
+ 
+ digitalInputValue=digitalRead(Hall_Sensor_D);
+ Serial.println(digitalInputValue);
+ analogInputValue=analogRead(Hall_Sensor);
+ Serial.println(analogInputValue);
+ delay(1000);
+
+
+digitalWrite(dir1,HIGH);
+digitalWrite(dir2,LOW);
+analogWrite(speedPin,mSpeed); //Write Motor Speed
+
+//Hall effect sensor read
+int Value1=analogRead(Hall_Sensor);
+Serial.print("Original Value = ");
+Serial.print(Value1);
+int Value2=digitalRead(Hall_Sensor_D);
+Serial.print("\t");
+Serial.println(Value2);
+delay(100);
+Mapped=map(Value1, 170, 512, 0, 5);
+Serial.print("Voltage Value = ");
+Serial.println(Mapped);
+Serial.println(" ");
+delay(100);
+
+}

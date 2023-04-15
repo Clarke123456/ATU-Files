@@ -1,0 +1,90 @@
+#include <Servo.h>
+
+int Hall_Sensor=A0;
+int Hall_Sensor_D=2;
+
+int Value1=0,Value2=0;
+int Mapped;
+
+int servoPin=11;
+int servoPos=0;
+int servoPos1=30;
+int servoPos2=60;
+Servo myServo;
+
+int ena = 5;
+int in1 = 4;
+int in2 = 7;
+int in3 = 8;
+int in4 = 9;
+int enb = 10;
+
+void setup() {
+  // put your setup code here, to run once:
+Serial.begin(9600);
+myServo.attach(servoPin);
+
+pinMode(Hall_Sensor_D,INPUT);
+
+pinMode(ena,OUTPUT);
+pinMode(in1,OUTPUT);
+pinMode(in2,OUTPUT);
+pinMode(enb,OUTPUT);
+pinMode(in3,OUTPUT);
+pinMode(in4,OUTPUT);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:  
+  
+//Hall effect sensor read
+int Value1=analogRead(Hall_Sensor);
+Serial.print("Original Value = ");
+Serial.print(Value1);
+int Value2=digitalRead(Hall_Sensor_D);
+Serial.print("\t");
+Serial.println(Value2);
+delay(100);
+Mapped=map(Value1, 0, 512, 0, 5);
+Serial.print("Voltage Value = ");
+Serial.println(Mapped);
+Serial.println(" ");
+//delay(100);
+  
+//clockwise max speed motor A
+digitalWrite(in1,HIGH);
+digitalWrite(in2,LOW);
+analogWrite(ena,180);
+delay(5000);
+
+
+//activate and deactivate servo 
+myServo.write(servoPos);
+delay(5000);
+myServo.write(servoPos1);
+delay(5000);
+myServo.write(servoPos2);
+delay(5000);
+myServo.write(servoPos);
+delay(5000);
+
+
+//clockwise max speed motor B
+digitalWrite(in3,HIGH);
+digitalWrite(in4,LOW);
+analogWrite(enb,180);
+delay(5000);
+
+
+//stop
+digitalWrite(in1,LOW);
+digitalWrite(in2,LOW);
+digitalWrite(in3,LOW);
+digitalWrite(in4,LOW);
+delay(5000);
+
+
+
+}
+

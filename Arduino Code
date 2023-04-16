@@ -1,0 +1,62 @@
+#include <Servo.h>
+int servoPin=11;
+int servoPos=0;
+int servoPos1=30;
+int servoPos2=60;
+Servo myServo;
+
+int ena = 5;
+int in1 = 6;
+int in2 = 7;
+int in3 = 8;
+int in4 = 9;
+int enb = 10;
+
+void setup() {
+  // put your setup code here, to run once:
+Serial.begin(9600);
+myServo.attach(servoPin);
+
+pinMode(ena,OUTPUT);
+pinMode(in1,OUTPUT);
+pinMode(in2,OUTPUT);
+pinMode(enb,OUTPUT);
+pinMode(in3,OUTPUT);
+pinMode(in4,OUTPUT);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+//clockwise max speed motor A
+digitalWrite(in1,HIGH);
+digitalWrite(in2,LOW);
+analogWrite(ena,255);
+delay(5000);
+
+//activate and deactivate servo 
+myServo.write(servoPos);
+delay(5000);
+myServo.write(servoPos1);
+delay(5000);
+myServo.write(servoPos2);
+delay(5000);
+myServo.write(servoPos);
+delay(5000);
+
+//clockwise max speed motor B
+digitalWrite(in3,HIGH);
+digitalWrite(in4,LOW);
+analogWrite(enb,255);
+delay(5000);
+
+//stop
+digitalWrite(in1,LOW);
+digitalWrite(in2,LOW);
+digitalWrite(in3,LOW);
+digitalWrite(in4,LOW);
+delay(5000);
+
+}
+

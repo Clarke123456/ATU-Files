@@ -1,0 +1,84 @@
+% Read in RGB Image
+rgb = imread('3.png');                              %Read in Image
+figure,imshow(rgb),title('RGB Image')               %Display Image
+
+% Convert to Greyscale
+I = rgb2gray(rgb);                                  %Convert rgb to gray
+figure,imshow(I),title('GreyScale Image')           %Display Gray Image
+
+% Binary mask and Threshold
+[~,threshold] = edge(I,'sobel');                   %Calculate thresh using edge & sobel
+fudgeFactor = 0.9;                                  %Tune Thresh
+BWs = edge(I,'sobel',threshold * fudgeFactor);      %Create Binary mask using Edge again
+figure,imshow(BWs),title('Binary Gradient Mask')    %Display Binary Gradient Mask
+
+% Dilate binary gradient mask
+se90 = strel('line',3,90);                          %Create Linear Structering Element
+se0 = strel('line',3,0);                            %Create Linear Structering Element-Perpendicular
+BWsdil = imdilate(BWs,[se90 se0]);                  %Dilate Binary Gradient Mask
+figure,imshow(BWsdil),title('Dilated Gradient Mask')%Display Dialted Gradient Mask
+
+% Fill in objects
+BWdfill = imfill(BWsdil,'holes');                   %Fill Interior Gaps
+figure,imshow(BWdfill),title('Binary Image with Filled Holes') %Display Filled Binary Image
+
+% Remove connected border elements
+BWnobord = imclearborder(BWdfill,4);                %Remove Connected Border Oblects
+figure,imshow(BWnobord),title('Cleared Border Image')%Display Result
+
+% Smooth objects by erosion
+seD = strel('diamond',1);                           %Create diamond structering Element using Strel Function
+BWfinal = imerode(BWnobord,seD);                    %Smooth Object By Eroding
+BWfinal = imerode(BWfinal,seD);                     %Smooth Object By Eroding
+figure,imshow(BWfinal),title('Segmented Image');    %Display Segmented Image
+
+% Fill objects in binary image
+BWdfinal = imfill(BWfinal,'holes');                 %Fill Holes In Binary Image
+figure,imshow(BWdfinal),title('Binary Image with Filled Holes')%Display Result
+
+% Remove objects with small pixel count
+BWffinal = bwareaopen(BWdfinal,400);                %Remove Objects With Fewer Than 400 Pixels
+figure,imshow(BWffinal),title('Clean Image')        %Display Cleaned Image
+
+% Refill objects in image
+BWfill = imfill(BWffinal,'holes');                  %Repeat Fill Holes In Binary Image  
+figure,imshow(BWfill),title('Binary Image Refilled')%Display Result
+
+% Attach labels to each object and measure properties
+[labeledImage, numberOfObjcts] = bwlabel(BWfill);                         %Get number of objects and Attach Label to Components
+blobMeasurements=regionprops(labeledImage,'Perimeter','Area','Centroid'); %Measure Properties Of Regions
+
+% Display labels for each object
+figure, imshow(BWfill, []),title('See the Labels')  % Display Labels for images
+vislabels(labeledImage)
+
+% Get circularity information using circularity equation
+circularities = [blobMeasurements.Perimeter].*[blobMeasurements.Perimeter]./(4*pi*[blobMeasurements.Area]);  %Circularity Equation
+
+% Implement conditional statements
+for blobnumber = 1 : numberOfObjcts
+    if circularities(blobnumber) < 1.18             %Conditional Statement
+        message = sprintf('circularity of object #%d is %.3f, Therefore the object is a circle',...
+        blobnumber, circularities(blobnumber));
+    elseif circularities(blobnumber) < 1.277        %Conditional Statement
+        message = sprintf('circularity of object #%d is %.3f, Therefore the object is a square',...
+        blobnumber, circularities(blobnumber));
+   
+    elseif circularities(blobnumber) < 1.53         %Conditional Statement
+        message = sprintf('circularity of object #%d is %.3f, Therefore the object is a rectangle',...
+        blobnumber, circularities(blobnumber));
+    
+    else                                            %Conditional Statement
+        message = sprintf('circularity of object #%d is %.3f, Therefore the object is a triangle',...
+        blobnumber, circularities(blobnumber));
+    end
+    uiwait(msgbox(message));                        %Wait For Rsponse To Dialog Box
+end                                                 %Program End
+
+
+        
+   
+
+
+
+
